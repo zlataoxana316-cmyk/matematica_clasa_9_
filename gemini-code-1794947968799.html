@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul Algebric – Clasa a 8-a | Resursă Digitală Interactivă</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono pentru expresii matematice clare -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Stiluri personalizate pentru tipografie matematică și fracții */
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .math-expr {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .math-var {
+            font-style: italic;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 1.08em;
+            padding: 0 1px;
+        }
+
+        /* Fracție matematică stilizată cu linie de fracție */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+            font-size: 0.92em;
+            line-height: 1.15;
+        }
+
+        .frac-num {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 5px 2px 5px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .frac-den {
+            padding: 2px 5px 0 5px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Animații fluide pentru tranziții între file */
+        .tab-panel {
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ascundere scrollbar pe bara de navigare mobilă dar păstrare scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER PRINCIPAL -->
+    <header class="bg-gradient-to-r from-brand-800 via-brand-700 to-indigo-800 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3.5 gap-3">
+                <!-- Titlu & Identitate Curriculum RM -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/15 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shrink-0">
+                        <i data-lucide="sigma" class="w-6 h-6 text-amber-300"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[11px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-200 border border-amber-300/30 px-2 py-0.5 rounded-full">
+                                Clasa a 8-a • Curriculum RM
+                            </span>
+                            <span class="text-xs text-indigo-200 hidden sm:inline">Matematică • Algebră</span>
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white mt-0.5">
+                            Calcul Algebric — Manual Digital Interactiv
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Buton Ajutor Rapid / Notare Simboluri -->
+                <div class="flex items-center gap-2 self-start md:self-auto">
+                    <button onclick="toggleHelpModal()" class="flex items-center gap-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/15 transition">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i>
+                        <span>Ghid introducere răspunsuri</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BARA DE NAVIGARE CU CELE 4 FILE (TABS) -->
+            <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar pt-1" aria-label="Secțiuni lecție">
+                <button onclick="switchTab('teorie')" id="tab-btn-teorie" class="tab-btn active-tab group flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-t-xl border-b-2 transition-all whitespace-nowrap bg-slate-50 text-brand-700 border-amber-400">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>1. Teorie și Exemple</span>
+                </button>
+                <button onclick="switchTab('exercitii')" id="tab-btn-exercitii" class="tab-btn group flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-t-xl border-b-2 transition-all whitespace-nowrap text-indigo-100 hover:text-white hover:bg-white/10 border-transparent">
+                    <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                    <span>2. Exerciții Practice</span>
+                    <span id="practice-badge" class="text-[11px] bg-white/20 px-1.5 py-0.5 rounded-full">0/8</span>
+                </button>
+                <button onclick="switchTab('test')" id="tab-btn-test" class="tab-btn group flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-t-xl border-b-2 transition-all whitespace-nowrap text-indigo-100 hover:text-white hover:bg-white/10 border-transparent">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    <span>3. Test de Autoevaluare</span>
+                </button>
+                <button onclick="switchTab('rezultate')" id="tab-btn-rezultate" class="tab-btn group flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-t-xl border-b-2 transition-all whitespace-nowrap text-indigo-100 hover:text-white hover:bg-white/10 border-transparent">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span>4. Rezultate Elevi</span>
+                    <span id="results-count-badge" class="text-[11px] bg-emerald-400/25 text-emerald-100 px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONȚINUT PRINCIPAL -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+        <!-- ===================================================================== -->
+        <!-- FILA 1: TEORIE ȘI EXEMPLE                                             -->
+        <!-- ===================================================================== -->
+        <section id="panel-teorie" class="tab-panel space-y-8">
+            <!-- Introducere lecție -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-base font-extrabold">I</span>
+                        Sinteza teoretică a capitolului
+                    </h2>
+                    <p class="text-slate-600 mt-1 text-sm sm:text-base">
+                        Parcurge regulile fundamentale, formulele de calcul prescurtat și metodele de descompunere în factori înainte de a trece la exerciții.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                    <a href="#sec-polinoame" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition">a) Polinoame</a>
+                    <a href="#sec-formule" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition">b) Formule</a>
+                    <a href="#sec-factori" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition">c) Factorizare</a>
+                    <a href="#sec-rapoarte" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition">d) Rapoarte</a>
+                </div>
+            </div>
+
+            <!-- SUBTEMA A: Termeni asemenea și operații cu polinoame -->
+            <div id="sec-polinoame" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-28">
+                <div class="bg-indigo-50/80 border-b border-indigo-100 px-6 py-4 flex items-center gap-3">
+                    <span class="bg-brand-600 text-white font-bold text-sm px-2.5 py-1 rounded-lg">a)</span>
+                    <h3 class="text-lg font-bold text-slate-800">Termeni asemenea și operații cu polinoame</h3>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Definiție & Reguli -->
+                        <div class="space-y-4">
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                                <h4 class="font-bold text-brand-800 text-sm uppercase tracking-wide mb-1.5">1. Reducerea termenilor asemenea</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed">
+                                    <strong>Termenii asemenea</strong> sunt monoame care au exact aceeași parte literală (aceleași variabile la aceiași exponenți). Pentru a-i reduce, adunăm coeficienții lor și păstrăm partea literală neschimbată.
+                                </p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                                <h4 class="font-bold text-brand-800 text-sm uppercase tracking-wide mb-1.5">2. Adunarea și scăderea polinoamelor</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed">
+                                    La eliminarea parantezelor precedate de semnul <strong>„+”</strong>, semnele termenilor rămân neschimbate. La eliminarea parantezelor precedate de semnul <strong>„−”</strong>, <strong>schimbăm semnul</strong> fiecărui termen din paranteză!
+                                </p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                                <h4 class="font-bold text-brand-800 text-sm uppercase tracking-wide mb-1.5">3. Înmulțirea polinoamelor</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed">
+                                    • <strong>Monom × Polinom:</strong> Înmulțim monomul cu fiecare termen al polinomului: <span class="font-mono text-brand-700">a(b + c) = ab + ac</span>.<br>
+                                    • <strong>Polinom × Polinom:</strong> Înmulțim fiecare termen al primului polinom cu fiecare termen al celui de-al doilea: <span class="font-mono text-brand-700">(a + b)(c + d) = ac + ad + bc + bd</span>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Exemple explicite -->
+                        <div class="space-y-4">
+                            <div class="rounded-xl bg-amber-50/70 border border-amber-200 p-4">
+                                <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-2">
+                                    <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
+                                    <span>Exemplul 1 (Scăderea și reducerea termenilor):</span>
+                                </div>
+                                <div class="text-sm text-slate-800 space-y-1.5 font-mono bg-white p-3 rounded-lg border border-amber-100">
+                                    <div>E = (3x<sup>2</sup> − 5x + 2) − (x<sup>2</sup> − 4x + 7)</div>
+                                    <div class="text-slate-600 text-xs font-sans">Pas 1: Desfacem parantezele (atenție la semnul „−”!):</div>
+                                    <div>E = 3x<sup>2</sup> − 5x + 2 <span class="text-rose-600 font-bold">− x<sup>2</sup> + 4x − 7</span></div>
+                                    <div class="text-slate-600 text-xs font-sans">Pas 2: Grupăm și reducem termenii asemenea:</div>
+                                    <div>E = (3x<sup>2</sup> − x<sup>2</sup>) + (−5x + 4x) + (2 − 7)</div>
+                                    <div class="text-emerald-700 font-bold">E = 2x<sup>2</sup> − x − 5</div>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl bg-amber-50/70 border border-amber-200 p-4">
+                                <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-2">
+                                    <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
+                                    <span>Exemplul 2 (Înmulțirea a două polinoame):</span>
+                                </div>
+                                <div class="text-sm text-slate-800 space-y-1.5 font-mono bg-white p-3 rounded-lg border border-amber-100">
+                                    <div>P = (2x − 3)(x + 4)</div>
+                                    <div class="text-slate-600 text-xs font-sans">Pas 1: Înmulțim fiecare termen cu fiecare termen:</div>
+                                    <div>P = 2x·x + 2x·4 − 3·x − 3·4</div>
+                                    <div>P = 2x<sup>2</sup> + 8x − 3x − 12</div>
+                                    <div class="text-slate-600 text-xs font-sans">Pas 2: Reducem termenii asemenea (8x − 3x):</div>
+                                    <div class="text-emerald-700 font-bold">P = 2x<sup>2</sup> + 5x − 12</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBTEMA B: Formule de calcul prescurtat -->
+            <div id="sec-formule" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-28">
+                <div class="bg-indigo-50/80 border-b border-indigo-100 px-6 py-4 flex items-center gap-3">
+                    <span class="bg-brand-600 text-white font-bold text-sm px-2.5 py-1 rounded-lg">b)</span>
+                    <h3 class="text-lg font-bold text-slate-800">Formule de calcul prescurtat</h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-sm text-slate-600 mb-5">
+                        Aceste trei formule fundamentale sunt valabile pentru orice numere reale <span class="math-var">a</span> și <span class="math-var">b</span> (<span class="math-var">a, b</span> ∈ ℝ). Reține-le în ambele sensuri!
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <!-- Formula 1 -->
+                        <div class="rounded-2xl border-2 border-brand-100 bg-gradient-to-b from-brand-50/60 to-white p-5 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">1. Pătratul sumei</span>
+                                <div class="my-3 p-3 bg-white rounded-xl border border-brand-200 text-center font-mono text-base sm:text-lg font-bold text-brand-900 shadow-xs">
+                                    (a + b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                    Pătratul sumei a doi termeni este egal cu pătratul primului termen, <strong>plus</strong> dublul produsului lor, <strong>plus</strong> pătratul celui de-al doilea termen.
+                                </p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs font-mono space-y-1">
+                                <div class="font-sans font-bold text-amber-800">Exemplu:</div>
+                                <div>(2x + 3)<sup>2</sup> = (2x)<sup>2</sup> + 2·2x·3 + 3<sup>2</sup></div>
+                                <div class="text-emerald-700 font-bold">= 4x<sup>2</sup> + 12x + 9</div>
+                            </div>
+                        </div>
+
+                        <!-- Formula 2 -->
+                        <div class="rounded-2xl border-2 border-brand-100 bg-gradient-to-b from-brand-50/60 to-white p-5 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">2. Pătratul diferenței</span>
+                                <div class="my-3 p-3 bg-white rounded-xl border border-brand-200 text-center font-mono text-base sm:text-lg font-bold text-brand-900 shadow-xs">
+                                    (a − b)<sup>2</sup> = a<sup>2</sup> − 2ab + b<sup>2</sup>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                    Pătratul diferenței a doi termeni este egal cu pătratul primului termen, <strong>minus</strong> dublul produsului lor, <strong>plus</strong> pătratul celui de-al doilea termen.
+                                </p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs font-mono space-y-1">
+                                <div class="font-sans font-bold text-amber-800">Exemplu:</div>
+                                <div>(x − 5)<sup>2</sup> = x<sup>2</sup> − 2·x·5 + 5<sup>2</sup></div>
+                                <div class="text-emerald-700 font-bold">= x<sup>2</sup> − 10x + 25</div>
+                            </div>
+                        </div>
+
+                        <!-- Formula 3 -->
+                        <div class="rounded-2xl border-2 border-brand-100 bg-gradient-to-b from-brand-50/60 to-white p-5 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">3. Diferența de pătrate</span>
+                                <div class="my-3 p-3 bg-white rounded-xl border border-brand-200 text-center font-mono text-base sm:text-lg font-bold text-brand-900 shadow-xs">
+                                    a<sup>2</sup> − b<sup>2</sup> = (a − b)(a + b)
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                    Produsul dintre diferența și suma a doi termeni este egal cu diferența pătratelor acestor termeni: <span class="font-mono">(a − b)(a + b) = a<sup>2</sup> − b<sup>2</sup></span>.
+                                </p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs font-mono space-y-1">
+                                <div class="font-sans font-bold text-amber-800">Exemplu:</div>
+                                <div>(3x − 2)(3x + 2) = (3x)<sup>2</sup> − 2<sup>2</sup></div>
+                                <div class="text-emerald-700 font-bold">= 9x<sup>2</sup> − 4</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBTEMA C: Metode de descompunere în factori -->
+            <div id="sec-factori" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-28">
+                <div class="bg-indigo-50/80 border-b border-indigo-100 px-6 py-4 flex items-center gap-3">
+                    <span class="bg-brand-600 text-white font-bold text-sm px-2.5 py-1 rounded-lg">c)</span>
+                    <h3 class="text-lg font-bold text-slate-800">Metode de descompunere în factori</h3>
+                </div>
+                <div class="p-6 space-y-5">
+                    <p class="text-sm text-slate-600">
+                        A descompune un polinom în factori înseamnă a-l scrie ca un <strong>produs</strong> de două sau mai multe polinoame (sau monoame) de grad mai mic.
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <!-- Metoda 1 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm mb-1">1. Scoaterea factorului comun</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Identificăm cel mai mare divizor comun al coeficienților și puterea cea mai mică a literelor comune tuturor termenilor.
+                                </p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs font-mono space-y-1">
+                                <div class="text-slate-500 font-sans font-semibold">Exemplu:</div>
+                                <div>6x<sup>3</sup> − 9x<sup>2</sup> =</div>
+                                <div class="text-emerald-700 font-bold">= 3x<sup>2</sup>(2x − 3)</div>
+                            </div>
+                        </div>
+
+                        <!-- Metoda 2 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm mb-1">2. Utilizarea formulelor</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Recunoaștem structura unei formule de calcul prescurtat de la dreapta la stânga: <span class="font-mono">a<sup>2</sup> − b<sup>2</sup></span> sau <span class="font-mono">a<sup>2</sup> ± 2ab + b<sup>2</sup></span>.
+                                </p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs font-mono space-y-1">
+                                <div class="text-slate-500 font-sans font-semibold">Exemplu:</div>
+                                <div>25x<sup>2</sup> − 16 = (5x)<sup>2</sup> − 4<sup>2</sup></div>
+                                <div class="text-emerald-700 font-bold">= (5x − 4)(5x + 4)</div>
+                            </div>
+                        </div>
+
+                        <!-- Metoda 3 -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm mb-1">3. Gruparea termenilor</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Grupăm termenii câte doi, scoatem factorul comun în fiecare grupă, apoi scoatem paranteza comună.
+                                </p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs font-mono space-y-1">
+                                <div class="text-slate-500 font-sans font-semibold">Exemplu:</div>
+                                <div>ax + ay + 2x + 2y =</div>
+                                <div>= a(x + y) + 2(x + y)</div>
+                                <div class="text-emerald-700 font-bold">= (x + y)(a + 2)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBTEMA D: Rapoarte algebrice -->
+            <div id="sec-rapoarte" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-28">
+                <div class="bg-indigo-50/80 border-b border-indigo-100 px-6 py-4 flex items-center gap-3">
+                    <span class="bg-brand-600 text-white font-bold text-sm px-2.5 py-1 rounded-lg">d)</span>
+                    <h3 class="text-lg font-bold text-slate-800">Rapoarte algebrice: DVA și simplificarea</h3>
+                </div>
+                <div class="p-6 grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200/80">
+                            <h4 class="font-bold text-rose-900 text-sm flex items-center gap-1.5 mb-1.5">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                                <span>Domeniul Valorilor Admisibile (DVA)</span>
+                            </h4>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Împărțirea la zero <strong>nu are sens</strong>! Pentru un raport algebric
+                                <span class="frac font-mono font-semibold">
+                                    <span class="frac-num">P(x)</span>
+                                    <span class="frac-den">Q(x)</span>
+                                </span>,
+                                <strong>DVA</strong> reprezintă mulțimea tuturor valorilor reale ale variabilei pentru care numitorul este diferit de zero: <span class="font-mono font-bold text-rose-800">Q(x) ≠ 0</span>.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            <h4 class="font-bold text-brand-800 text-sm mb-1.5">Pașii pentru simplificarea unui raport algebric:</h4>
+                            <ol class="list-decimal list-inside text-sm text-slate-700 space-y-1.5">
+                                <li><strong>Descompunem în factori</strong> atât numărătorul, cât și numitorul.</li>
+                                <li>Stabilim <strong>DVA</strong> (punem condiția ca fiecare factor de la numitor să fie ≠ 0).</li>
+                                <li><strong>Simplificăm</strong> factorii comuni identici de la numărător și numitor (niciodată termeni izolați dintr-o sumă!).</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Exemplu complet raport algebric -->
+                    <div class="rounded-xl bg-amber-50/70 border border-amber-200 p-5 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-3">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
+                            <span>Exemplu complet (DVA + Simplificare):</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-amber-100 space-y-3 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-600">Simplificați raportul:</span>
+                                <span class="frac font-mono font-bold text-base">
+                                    <span class="frac-num">x<sup>2</sup> − 9</span>
+                                    <span class="frac-den">x<sup>2</sup> + 3x</span>
+                                </span>
+                            </div>
+                            <div class="border-t border-slate-100 pt-2 space-y-2">
+                                <p class="text-xs font-semibold text-brand-700">1. Descompunem în factori numărătorul și numitorul:</p>
+                                <div class="font-mono text-xs bg-slate-50 p-2 rounded">
+                                    • Numărător: x<sup>2</sup> − 9 = (x − 3)(x + 3)  <span class="text-slate-400">(diferență de pătrate)</span><br>
+                                    • Numitor: x<sup>2</sup> + 3x = x(x + 3)  <span class="text-slate-400">(factor comun)</span>
+                                </div>
+                                <p class="text-xs font-semibold text-rose-700">2. Determinăm DVA:</p>
+                                <div class="font-mono text-xs bg-rose-50/70 p-2 rounded text-rose-900">
+                                    x(x + 3) ≠ 0  ⇒  x ≠ 0 și x ≠ −3  ⇒  <strong>DVA: x ∈ ℝ \ {−3; 0}</strong>
+                                </div>
+                                <p class="text-xs font-semibold text-emerald-700">3. Simplificăm factorul comun (x + 3):</p>
+                                <div class="flex items-center gap-2 font-mono text-sm">
+                                    <span class="frac">
+                                        <span class="frac-num">(x − 3)<del class="text-rose-500">(x + 3)</del></span>
+                                        <span class="frac-den">x<del class="text-rose-500">(x + 3)</del></span>
+                                    </span>
+                                    <span>=</span>
+                                    <span class="frac font-bold text-emerald-700 text-base">
+                                        <span class="frac-num">x − 3</span>
+                                        <span class="frac-den">x</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to action către Exerciții -->
+            <div class="flex justify-end">
+                <button onclick="switchTab('exercitii')" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition">
+                    <span>Mergi la Exerciții Practice</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- FILA 2: EXERCIȚII PRACTICE                                            -->
+        <!-- ===================================================================== -->
+        <section id="panel-exercitii" class="tab-panel hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-base font-extrabold">II</span>
+                        Exerciții practice cu verificare imediată
+                    </h2>
+                    <p class="text-slate-600 mt-1 text-sm">
+                        Rezolvă pe caiet, introdu forma finală simplificată în casetă și apasă <strong>„Verifică”</strong>. Poți consulta oricând rezolvarea detaliată pas cu pas.
+                    </p>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-center shrink-0">
+                    <div class="text-xs text-slate-500 font-medium">Progres exerciții</div>
+                    <div id="practice-progress-text" class="text-lg font-extrabold text-brand-700">0 din 8 rezolvate</div>
+                </div>
+            </div>
+
+            <!-- Container unde JS generează cele 8 exerciții interactive -->
+            <div id="practice-exercises-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Populat dinamic via JS -->
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="switchTab('teorie')" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl bg-white border border-slate-200 transition text-sm">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Înapoi la Teorie</span>
+                </button>
+                <button onclick="switchTab('test')" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition text-sm">
+                    <span>Începe Testul de Autoevaluare</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- FILA 3: TEST DE AUTOEVALUARE (10 ÎNTREBĂRI)                           -->
+        <!-- ===================================================================== -->
+        <section id="panel-test" class="tab-panel hidden space-y-6">
+            <!-- Ecran 1: Identificare Elev înainte de test -->
+            <div id="quiz-intro-card" class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-800">Test Formativ de Autoevaluare</h2>
+                <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+                    Acest test conține <strong>10 întrebări grilă</strong> din capitolul <em>Calcul algebric</em> (clasa a 8-a). Fiecare răspuns corect valorează <strong>1 punct</strong>. La final vei primi feedback detaliat pentru fiecare item, iar rezultatul tău va fi înregistrat în catalogul clasei.
+                </p>
+
+                <div class="mt-6 space-y-4">
+                    <div>
+                        <label for="student-name" class="block text-sm font-semibold text-slate-700 mb-1">
+                            Numele și Prenumele elevului <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" id="student-name" placeholder="Ex: Popescu Andrei" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm">
+                        <p id="student-name-error" class="text-xs text-rose-600 mt-1 hidden">Te rugăm să introduci numele și prenumele înainte de a începe testul.</p>
+                    </div>
+
+                    <div>
+                        <label for="student-class" class="block text-sm font-semibold text-slate-700 mb-1">
+                            Clasa
+                        </label>
+                        <select id="student-class" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition text-sm bg-white">
+                            <option value="8-A">Clasa a 8-A</option>
+                            <option value="8-B">Clasa a 8-B</option>
+                            <option value="8-C">Clasa a 8-C</option>
+                            <option value="8-D">Clasa a 8-D</option>
+                        </select>
+                    </div>
+
+                    <button onclick="startQuiz()" class="w-full mt-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        <span>Începe testul (10 întrebări)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ecran 2: Testul activ & Rezultatele cu feedback -->
+            <div id="quiz-active-container" class="hidden space-y-6">
+                <!-- Bara de stare elev în timpul testului -->
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-500">Elev evaluat:</div>
+                            <div class="font-bold text-slate-800" id="active-student-display">—</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="quiz-answered-counter" class="text-xs font-semibold bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">
+                            Răspunsuri selectate: 0 / 10
+                        </span>
+                        <button onclick="retakeQuiz(true)" class="text-xs font-semibold text-slate-600 hover:text-brand-700 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-brand-300 transition flex items-center gap-1">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Resetează / Alt elev</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Banner scor final (vizibil doar după trimitere) -->
+                <div id="quiz-score-banner" class="hidden rounded-2xl p-6 sm:p-8 text-white shadow-lg bg-gradient-to-r from-brand-800 to-indigo-700">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div class="space-y-2">
+                            <span class="inline-block text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">
+                                Rezultat Evaluare Formativă
+                            </span>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold" id="score-headline">Felicitări!</h3>
+                            <p class="text-indigo-100 text-sm max-w-xl" id="score-feedback-msg">
+                                Rezultatul tău a fost salvat automat în fila „Rezultate Elevi”. Analizează mai jos explicațiile pentru fiecare întrebare.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4 bg-white/15 backdrop-blur-sm border border-white/20 p-4 rounded-2xl shrink-0">
+                            <div class="text-center px-3">
+                                <div class="text-xs text-indigo-200 uppercase font-semibold">Punctaj</div>
+                                <div class="text-3xl font-black text-white" id="score-points">0/10</div>
+                            </div>
+                            <div class="h-10 w-px bg-white/25"></div>
+                            <div class="text-center px-3">
+                                <div class="text-xs text-indigo-200 uppercase font-semibold">Nota (RM)</div>
+                                <div class="text-3xl font-black text-amber-300" id="score-grade">1</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-white/15 flex flex-wrap gap-3">
+                        <button onclick="retakeQuiz(false)" class="bg-white text-brand-800 hover:bg-indigo-50 font-bold text-sm px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-xs">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Reia testul (întrebări amestecate)</span>
+                        </button>
+                        <button onclick="switchTab('rezultate')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-xs">
+                            <i data-lucide="table" class="w-4 h-4"></i>
+                            <span>Vezi tabelul cu rezultatele clasei</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mesaj de avertizare dacă nu s-a răspuns la toate întrebările -->
+                <div id="quiz-validation-alert" class="hidden bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                    <span id="quiz-validation-text">Te rugăm să răspunzi la toate cele 10 întrebări înainte de a finaliza testul.</span>
+                </div>
+
+                <!-- Lista celor 10 întrebări -->
+                <div id="quiz-questions-list" class="space-y-5">
+                    <!-- Populat dinamic via JS -->
+                </div>
+
+                <!-- Buton Finalizare Test -->
+                <div id="quiz-submit-wrapper" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-sm text-slate-600">
+                        Verifică dacă ai selectat câte o variantă la toate cele 10 întrebări, apoi apasă butonul de mai jos.
+                    </p>
+                    <button onclick="submitQuiz()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                        <i data-lucide="check-square" class="w-5 h-5"></i>
+                        <span>Finalizează și verifică testul</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- FILA 4: REZULTATE ELEVI (CATALOG CENTRALIZATOR)                       -->
+        <!-- ===================================================================== -->
+        <section id="panel-rezultate" class="tab-panel hidden space-y-6">
+            <!-- Header & Acțiuni -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-brand-700 flex items-center justify-center text-base font-extrabold">IV</span>
+                        Situația rezultatelor elevilor
+                    </h2>
+                    <p class="text-slate-600 mt-1 text-sm">
+                        Centralizator automat al rezultatelor obținute la testul de autoevaluare (sistem de notare 1–10, Republica Moldova).
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button onclick="exportResultsCSV()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Exportă CSV (Excel)</span>
+                    </button>
+                    <button onclick="requestClearResults()" class="inline-flex items-center gap-2 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Șterge istoricul</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carduri Statistici Rapide -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Elevi evaluați</div>
+                        <div class="text-2xl font-extrabold text-slate-800" id="stat-total-students">0</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Media clasei (Notă)</div>
+                        <div class="text-2xl font-extrabold text-emerald-700" id="stat-avg-grade">—</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">Cel mai mare punctaj</div>
+                        <div class="text-2xl font-extrabold text-amber-600" id="stat-max-score">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtru după clasă -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70">
+                    <div class="text-sm font-bold text-slate-700">Registrul evaluărilor</div>
+                    <div class="flex items-center gap-2">
+                        <label for="filter-class" class="text-xs font-medium text-slate-600">Filtrează clasa:</label>
+                        <select id="filter-class" onchange="renderResultsTable()" class="text-xs font-semibold bg-white border border-slate-300 rounded-lg px-3 py-1.5 outline-none focus:border-brand-500">
+                            <option value="ALL">Toate clasele</option>
+                            <option value="8-A">8-A</option>
+                            <option value="8-B">8-B</option>
+                            <option value="8-C">8-C</option>
+                            <option value="8-D">8-D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
+                                <th class="py-3.5 px-5 font-bold">#</th>
+                                <th class="py-3.5 px-5 font-bold">Nume și Prenume</th>
+                                <th class="py-3.5 px-5 font-bold">Clasa</th>
+                                <th class="py-3.5 px-5 font-bold">Punctaj</th>
+                                <th class="py-3.5 px-5 font-bold">Nota (1–10)</th>
+                                <th class="py-3.5 px-5 font-bold">Nivel / Calificativ</th>
+                                <th class="py-3.5 px-5 font-bold">Data și ora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populat dinamic via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Stare goală -->
+                <div id="results-empty-state" class="hidden py-12 px-4 text-center">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="inbox" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-slate-600 font-semibold">Nu există încă rezultate înregistrate pentru selecția curentă.</p>
+                    <p class="text-xs text-slate-500 mt-1">Rezultatele apar automat imediat ce un elev finalizează „Testul de Autoevaluare”.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-5 mt-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <div>Resursă educațională deschisă • Matematică, Clasa a 8-a (Curriculumul Național, Republica Moldova)</div>
+            <div>Tema: <strong>Calcul algebric</strong></div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODALURI PERSONALIZATE (Fără alert() sau confirm() nativ)             -->
+    <!-- ===================================================================== -->
+    
+    <!-- Modal Ghid scriere răspunsuri matematice -->
+    <div id="help-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <i data-lucide="keyboard" class="w-5 h-5 text-brand-600"></i>
+                    <span>Cum introduc răspunsurile?</span>
+                </h3>
+                <button onclick="toggleHelpModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-sm text-slate-600">
+                <p>În fila <strong>„2. Exerciții Practice”</strong>, poți scrie expresiile algebrice folosind tastatura obișnuită:</p>
+                <ul class="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+                    <li>• <strong>Puteri:</strong> folosește simbolul <code class="bg-white px-1.5 py-0.5 rounded border font-bold text-brand-700">^</code>, de exemplu <code class="font-mono font-bold">x^2</code> pentru x<sup>2</sup>.</li>
+                    <li>• <strong>Înmulțirea:</strong> scrie direct <code class="font-mono font-bold">3x</code> sau <code class="font-mono font-bold">(x-2)(x+2)</code> (nu este nevoie de semnul <code class="font-mono">*</code>).</li>
+                    <li>• <strong>Fracții:</strong> folosește bara oblică <code class="bg-white px-1.5 py-0.5 rounded border font-bold text-brand-700">/</code>, de exemplu <code class="font-mono font-bold">(x-2)/x</code> sau <code class="font-mono font-bold">3/(x+1)</code>.</li>
+                    <li>• <strong>Spațiile</strong> sunt ignorate automat (<code class="font-mono">x^2 - 9</code> este identic cu <code class="font-mono">x^2-9</code>).</li>
+                </ul>
+            </div>
+            <div class="mt-5 flex justify-end">
+                <button onclick="toggleHelpModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm px-5 py-2 rounded-xl transition">
+                    Am înțeles
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmare Ștergere Istoric Rezultate -->
+    <div id="confirm-clear-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+            <div class="flex items-center gap-3 text-rose-600 mb-3">
+                <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Ștergi istoricul rezultatelor?</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                Această acțiune va șterge toate rezultatele salvate în acest browser (inclusiv datele demonstrative). Acțiunea este ireversibilă. Recomandăm să exporți mai întâi tabelul în format CSV.
+            </p>
+            <div class="mt-6 flex justify-end gap-2.5">
+                <button onclick="closeClearModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition">
+                    Anulează
+                </button>
+                <button onclick="confirmClearResults()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm transition">
+                    Da, șterge tot
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification discret -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 bg-slate-900 text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg transition-all">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Mesaj</span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- LOGICA JAVASCRIPT A APLICAȚIEI                                        -->
+    <!-- ===================================================================== -->
+    <script>
+        // =========================================================================
+        // 1. DATELE PENTRU EXERCIȚIILE PRACTICE (FILA 2)
+        // =========================================================================
+        const practiceExercises = [
+            {
+                id: 1,
+                category: "Operații cu polinoame",
+                promptHTML: `Aduceți la forma canonică expresia:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">E(x) = (4x<sup>2</sup> − 3x + 5) − (2x<sup>2</sup> − 7x + 1)</span>`,
+                placeholder: "Ex: 2x^2+4x+4",
+                hint: "Nu uita să schimbi semnele tuturor termenilor din a doua paranteză!",
+                acceptedAnswers: ["2x^2+4x+4", "2x²+4x+4", "4+4x+2x^2", "2x^2+4+4x"],
+                displayAnswerHTML: "2x<sup>2</sup> + 4x + 4",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Desfacem parantezele (la a doua paranteză schimbăm semnele deoarece are „−” în față):</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">E(x) = 4x<sup>2</sup> − 3x + 5 − 2x<sup>2</sup> + 7x − 1</p>
+                    <p><strong>Pasul 2:</strong> Grupăm termenii asemenea:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">E(x) = (4x<sup>2</sup> − 2x<sup>2</sup>) + (−3x + 7x) + (5 − 1)</p>
+                    <p><strong>Pasul 3:</strong> Calculăm coeficienții: <span class="font-mono font-bold text-emerald-700">E(x) = 2x<sup>2</sup> + 4x + 4</span></p>
+                `
+            },
+            {
+                id: 2,
+                category: "Formule de calcul prescurtat",
+                promptHTML: `Calculați folosind formula pătratului diferenței:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">(3x − 2)<sup>2</sup></span>`,
+                placeholder: "Ex: 9x^2-12x+4",
+                hint: "Aplică (a − b)² = a² − 2ab + b², unde a = 3x și b = 2.",
+                acceptedAnswers: ["9x^2-12x+4", "9x²-12x+4", "4-12x+9x^2"],
+                displayAnswerHTML: "9x<sup>2</sup> − 12x + 4",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Identificăm termenii formulei <span class="font-mono">(a − b)<sup>2</sup> = a<sup>2</sup> − 2ab + b<sup>2</sup></span>, cu <span class="font-mono">a = 3x</span> și <span class="font-mono">b = 2</span>.</p>
+                    <p><strong>Pasul 2:</strong> Înlocuim în formulă:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">(3x − 2)<sup>2</sup> = (3x)<sup>2</sup> − 2 · 3x · 2 + 2<sup>2</sup></p>
+                    <p><strong>Pasul 3:</strong> Efectuăm ridicarea la putere și înmulțirea: <span class="font-mono font-bold text-emerald-700">9x<sup>2</sup> − 12x + 4</span></p>
+                `
+            },
+            {
+                id: 3,
+                category: "Formule de calcul prescurtat",
+                promptHTML: `Simplificați expresia:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">A(x) = (x + 4)<sup>2</sup> − (x − 3)(x + 3)</span>`,
+                placeholder: "Ex: 8x+25",
+                hint: "Atenție la minusul din fața produsului (x − 3)(x + 3) = x² − 9!",
+                acceptedAnswers: ["8x+25", "25+8x"],
+                displayAnswerHTML: "8x + 25",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Dezvoltăm fiecare produs folosind formulele de calcul prescurtat:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">• (x + 4)<sup>2</sup> = x<sup>2</sup> + 8x + 16<br>• (x − 3)(x + 3) = x<sup>2</sup> − 9</p>
+                    <p><strong>Pasul 2:</strong> Scădem rezultatele (păstrăm paranteza după semnul minus):</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">A(x) = x<sup>2</sup> + 8x + 16 − (x<sup>2</sup> − 9) = x<sup>2</sup> + 8x + 16 − x<sup>2</sup> + 9</p>
+                    <p><strong>Pasul 3:</strong> Reducem <span class="font-mono">x<sup>2</sup> − x<sup>2</sup> = 0</span> și obținem: <span class="font-mono font-bold text-emerald-700">A(x) = 8x + 25</span></p>
+                `
+            },
+            {
+                id: 4,
+                category: "Descompunere în factori",
+                promptHTML: `Descompuneți în factori prin metoda factorului comun:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">12x<sup>3</sup> − 8x<sup>2</sup></span>`,
+                placeholder: "Ex: 4x^2(3x-2)",
+                hint: "Cel mai mare divizor comun al lui 12 și 8 este 4, iar puterea minimă a lui x este x².",
+                acceptedAnswers: ["4x^2(3x-2)", "4x²(3x-2)", "(3x-2)4x^2", "4x^2*(3x-2)"],
+                displayAnswerHTML: "4x<sup>2</sup>(3x − 2)",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Determinăm cel mai mare divizor comun al coeficienților: <span class="font-mono">cmmdc(12, 8) = 4</span>.</p>
+                    <p><strong>Pasul 2:</strong> Alegem variabila comună la exponentul cel mai mic: <span class="font-mono">x<sup>2</sup></span>. Factorul comun este <span class="font-mono">4x<sup>2</sup></span>.</p>
+                    <p><strong>Pasul 3:</strong> Împărțim fiecare termen la <span class="font-mono">4x<sup>2</sup></span> și scriem produsul: <span class="font-mono font-bold text-emerald-700">4x<sup>2</sup>(3x − 2)</span></p>
+                `
+            },
+            {
+                id: 5,
+                category: "Descompunere în factori",
+                promptHTML: `Descompuneți în factori folosind formulele de calcul prescurtat:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">49x<sup>2</sup> − 16</span>`,
+                placeholder: "Ex: (7x-4)(7x+4)",
+                hint: "Scrie 49x² ca (7x)² și 16 ca 4², apoi aplică diferența de pătrate.",
+                acceptedAnswers: ["(7x-4)(7x+4)", "(7x+4)(7x-4)"],
+                displayAnswerHTML: "(7x − 4)(7x + 4)",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Observăm că ambii termeni sunt pătrate perfecte: <span class="font-mono">49x<sup>2</sup> = (7x)<sup>2</sup></span> și <span class="font-mono">16 = 4<sup>2</sup></span>.</p>
+                    <p><strong>Pasul 2:</strong> Aplicăm formula <span class="font-mono">a<sup>2</sup> − b<sup>2</sup> = (a − b)(a + b)</span>:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200 font-bold text-emerald-700">(7x)<sup>2</sup> − 4<sup>2</sup> = (7x − 4)(7x + 4)</p>
+                `
+            },
+            {
+                id: 6,
+                category: "Descompunere prin grupare",
+                promptHTML: `Descompuneți în factori prin gruparea termenilor:<br><span class="font-mono text-base font-bold text-slate-900 mt-1 inline-block">x<sup>2</sup> + 5x + xy + 5y</span>`,
+                placeholder: "Ex: (x+5)(x+y)",
+                hint: "Grupează primii doi termeni (x² + 5x) și ultimii doi (xy + 5y).",
+                acceptedAnswers: ["(x+5)(x+y)", "(x+y)(x+5)", "(5+x)(x+y)", "(x+y)(5+x)"],
+                displayAnswerHTML: "(x + 5)(x + y)",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Grupăm termenii câte doi: <span class="font-mono">(x<sup>2</sup> + 5x) + (xy + 5y)</span>.</p>
+                    <p><strong>Pasul 2:</strong> Scoatem factorul comun în fiecare grupă (<span class="font-mono">x</span> în prima, <span class="font-mono">y</span> în a doua):</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">= x(x + 5) + y(x + 5)</p>
+                    <p><strong>Pasul 3:</strong> Scoatem paranteza comună <span class="font-mono">(x + 5)</span>: <span class="font-mono font-bold text-emerald-700">(x + 5)(x + y)</span></p>
+                `
+            },
+            {
+                id: 7,
+                category: "Rapoarte algebrice — DVA",
+                promptHTML: `Care este valoarea reală a lui <span class="math-var">x</span> care <strong>nu aparține</strong> DVA pentru raportul:<br>
+                <span class="frac font-mono text-base font-bold text-slate-900 mt-1">
+                    <span class="frac-num">x + 2</span>
+                    <span class="frac-den">2x − 8</span>
+                </span>`,
+                placeholder: "Ex: 4",
+                hint: "Egalăm numitorul cu zero (2x − 8 = 0) pentru a afla valoarea interzisă.",
+                acceptedAnswers: ["4", "x=4"],
+                displayAnswerHTML: "4 (DVA: x ∈ ℝ \\ {4})",
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Punem condiția de existență a raportului (numitorul ≠ 0):</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">2x − 8 ≠ 0  ⇒  2x ≠ 8  ⇒  x ≠ 4</p>
+                    <p><strong>Concluzie:</strong> Valoarea exclusă din DVA este <span class="font-mono font-bold text-emerald-700">4</span> (adică DVA: x ∈ ℝ \\ {4}).</p>
+                `
+            },
+            {
+                id: 8,
+                category: "Simplificarea rapoartelor algebrice",
+                promptHTML: `Simplificați raportul algebric (pentru x ∈ ℝ \\ {−5; 5}):<br>
+                <span class="frac font-mono text-base font-bold text-slate-900 mt-1">
+                    <span class="frac-num">x<sup>2</sup> − 25</span>
+                    <span class="frac-den">x<sup>2</sup> + 10x + 25</span>
+                </span>`,
+                placeholder: "Ex: (x-5)/(x+5)",
+                hint: "La numărător ai diferență de pătrate, iar la numitor pătratul sumei (x + 5)².",
+                acceptedAnswers: ["(x-5)/(x+5)", "(x-5)/(5+x)"],
+                displayAnswerHTML: `<span class="frac"><span class="frac-num">x − 5</span><span class="frac-den">x + 5</span></span>`,
+                solutionStepsHTML: `
+                    <p><strong>Pasul 1:</strong> Descompunem în factori numărătorul și numitorul:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200">• Numărător: x<sup>2</sup> − 25 = (x − 5)(x + 5)<br>• Numitor: x<sup>2</sup> + 10x + 25 = (x + 5)<sup>2</sup> = (x + 5)(x + 5)</p>
+                    <p><strong>Pasul 2:</strong> Simplificăm factorul comun <span class="font-mono">(x + 5)</span>:</p>
+                    <p class="font-mono bg-white p-2 rounded border border-slate-200 font-bold text-emerald-700">= (x − 5) / (x + 5)</p>
+                `
+            }
+        ];
+
+        // =========================================================================
+        // 2. BAZA DE ÎNTREBĂRI PENTRU TESTUL DE AUTOEVALUARE (10 ÎNTREBĂRI)
+        // =========================================================================
+        const quizQuestionsBank = [
+            {
+                id: 1,
+                topic: "Termeni asemenea",
+                questionHTML: `După reducerea termenilor asemenea în expresia <span class="font-mono font-bold">5x<sup>2</sup> − 3x + 2 − 2x<sup>2</sup> + 7x − 6</span>, se obține:`,
+                options: [
+                    { textHTML: `3x<sup>2</sup> + 4x − 4`, isCorrect: true },
+                    { textHTML: `3x<sup>2</sup> − 10x − 4`, isCorrect: false },
+                    { textHTML: `7x<sup>2</sup> + 4x − 8`, isCorrect: false },
+                    { textHTML: `3x<sup>2</sup> + 4x + 8`, isCorrect: false }
+                ],
+                explanationHTML: `Grupăm termenii asemenea: (5x<sup>2</sup> − 2x<sup>2</sup>) = 3x<sup>2</sup>; (−3x + 7x) = +4x; (2 − 6) = −4. Rezultatul corect este <strong>3x<sup>2</sup> + 4x − 4</strong>.`
+            },
+            {
+                id: 2,
+                topic: "Înmulțirea polinoamelor",
+                questionHTML: `Rezultatul înmulțirii <span class="font-mono font-bold">(x − 4)(x + 2)</span> este:`,
+                options: [
+                    { textHTML: `x<sup>2</sup> − 2x − 8`, isCorrect: true },
+                    { textHTML: `x<sup>2</sup> + 2x − 8`, isCorrect: false },
+                    { textHTML: `x<sup>2</sup> − 6x − 8`, isCorrect: false },
+                    { textHTML: `x<sup>2</sup> − 8`, isCorrect: false }
+                ],
+                explanationHTML: `Înmulțim fiecare termen: x·x + x·2 − 4·x − 4·2 = x<sup>2</sup> + 2x − 4x − 8 = <strong>x<sup>2</sup> − 2x − 8</strong>.`
+            },
+            {
+                id: 3,
+                topic: "Pătratul sumei",
+                questionHTML: `Dezvoltând expresia <span class="font-mono font-bold">(2a + 5)<sup>2</sup></span>, obținem:`,
+                options: [
+                    { textHTML: `4a<sup>2</sup> + 20a + 25`, isCorrect: true },
+                    { textHTML: `4a<sup>2</sup> + 25`, isCorrect: false },
+                    { textHTML: `2a<sup>2</sup> + 20a + 25`, isCorrect: false },
+                    { textHTML: `4a<sup>2</sup> + 10a + 25`, isCorrect: false }
+                ],
+                explanationHTML: `Aplicăm (x + y)<sup>2</sup> = x<sup>2</sup> + 2xy + y<sup>2</sup>: (2a)<sup>2</sup> + 2·2a·5 + 5<sup>2</sup> = <strong>4a<sup>2</sup> + 20a + 25</strong>.`
+            },
+            {
+                id: 4,
+                topic: "Pătratul diferenței",
+                questionHTML: `Care este forma desfășurată a expresiei <span class="font-mono font-bold">(x − 6)<sup>2</sup></span>?`,
+                options: [
+                    { textHTML: `x<sup>2</sup> − 12x + 36`, isCorrect: true },
+                    { textHTML: `x<sup>2</sup> − 12x − 36`, isCorrect: false },
+                    { textHTML: `x<sup>2</sup> − 36`, isCorrect: false },
+                    { textHTML: `x<sup>2</sup> − 6x + 36`, isCorrect: false }
+                ],
+                explanationHTML: `Conform formulei (a − b)<sup>2</sup> = a<sup>2</sup> − 2ab + b<sup>2</sup>: x<sup>2</sup> − 2·x·6 + 6<sup>2</sup> = <strong>x<sup>2</sup> − 12x + 36</strong>.`
+            },
+            {
+                id: 5,
+                topic: "Diferența de pătrate",
+                questionHTML: `Calculați produsul <span class="font-mono font-bold">(5x − 3)(5x + 3)</span>:`,
+                options: [
+                    { textHTML: `25x<sup>2</sup> − 9`, isCorrect: true },
+                    { textHTML: `5x<sup>2</sup> − 9`, isCorrect: false },
+                    { textHTML: `25x<sup>2</sup> + 9`, isCorrect: false },
+                    { textHTML: `25x<sup>2</sup> − 30x + 9`, isCorrect: false }
+                ],
+                explanationHTML: `Aplicăm (a − b)(a + b) = a<sup>2</sup> − b<sup>2</sup>: (5x)<sup>2</sup> − 3<sup>2</sup> = <strong>25x<sup>2</sup> − 9</strong>.`
+            },
+            {
+                id: 6,
+                topic: "Factor comun",
+                questionHTML: `Descompunerea în factori a polinomului <span class="font-mono font-bold">15x<sup>4</sup> − 10x<sup>2</sup></span> este:`,
+                options: [
+                    { textHTML: `5x<sup>2</sup>(3x<sup>2</sup> − 2)`, isCorrect: true },
+                    { textHTML: `5x<sup>2</sup>(3x<sup>2</sup> − 10)`, isCorrect: false },
+                    { textHTML: `5x(3x<sup>3</sup> − 2x)`, isCorrect: false },
+                    { textHTML: `15x<sup>2</sup>(x<sup>2</sup> − 10)`, isCorrect: false }
+                ],
+                explanationHTML: `Scoatem factorul comun maxim 5x<sup>2</sup>: 15x<sup>4</sup> : 5x<sup>2</sup> = 3x<sup>2</sup> și −10x<sup>2</sup> : 5x<sup>2</sup> = −2, deci obținem <strong>5x<sup>2</sup>(3x<sup>2</sup> − 2)</strong>.`
+            },
+            {
+                id: 7,
+                topic: "Descompunere cu formule",
+                questionHTML: `Polinomul <span class="font-mono font-bold">x<sup>2</sup> − 14x + 49</span> scris ca pătrat al unui binom este:`,
+                options: [
+                    { textHTML: `(x − 7)<sup>2</sup>`, isCorrect: true },
+                    { textHTML: `(x + 7)<sup>2</sup>`, isCorrect: false },
+                    { textHTML: `(x − 7)(x + 7)`, isCorrect: false },
+                    { textHTML: `(x − 49)<sup>2</sup>`, isCorrect: false }
+                ],
+                explanationHTML: `Observăm că x<sup>2</sup> − 2·x·7 + 7<sup>2</sup> reprezintă pătratul diferenței <strong>(x − 7)<sup>2</sup></strong>.`
+            },
+            {
+                id: 8,
+                topic: "Gruparea termenilor",
+                questionHTML: `Descompunând în factori expresia <span class="font-mono font-bold">ab − 3a + 2b − 6</span>, obținem:`,
+                options: [
+                    { textHTML: `(b − 3)(a + 2)`, isCorrect: true },
+                    { textHTML: `(b + 3)(a − 2)`, isCorrect: false },
+                    { textHTML: `(b − 3)(a − 2)`, isCorrect: false },
+                    { textHTML: `(a − 3)(b + 2)`, isCorrect: false }
+                ],
+                explanationHTML: `Grupăm primii doi și ultimii doi termeni: a(b − 3) + 2(b − 3) = <strong>(b − 3)(a + 2)</strong>.`
+            },
+            {
+                id: 9,
+                topic: "Domeniul Valorilor Admisibile (DVA)",
+                questionHTML: `Domeniul Valorilor Admisibile (DVA) al raportului algebric <span class="frac font-mono font-bold"><span class="frac-num">3x − 1</span><span class="frac-den">x(x − 5)</span></span> este:`,
+                options: [
+                    { textHTML: `x ∈ ℝ \\ {0; 5}`, isCorrect: true },
+                    { textHTML: `x ∈ ℝ \\ {5}`, isCorrect: false },
+                    { textHTML: `x ∈ ℝ \\ {−5; 0}`, isCorrect: false },
+                    { textHTML: `x ∈ ℝ \\ {0; 1/3; 5}`, isCorrect: false }
+                ],
+                explanationHTML: `Punem condiția ca numitorul să fie diferit de zero: x(x − 5) ≠ 0 ⇒ x ≠ 0 și x ≠ 5. Deci <strong>DVA: x ∈ ℝ \\ {0; 5}</strong>.`
+            },
+            {
+                id: 10,
+                topic: "Simplificarea rapoartelor algebrice",
+                questionHTML: `După simplificarea raportului <span class="frac font-mono font-bold"><span class="frac-num">x<sup>2</sup> − 4</span><span class="frac-den">2x + 4</span></span> (pentru x ≠ −2), obținem:`,
+                options: [
+                    { textHTML: `<span class="frac"><span class="frac-num">x − 2</span><span class="frac-den">2</span></span>`, isCorrect: true },
+                    { textHTML: `x − 2`, isCorrect: false },
+                    { textHTML: `<span class="frac"><span class="frac-num">x + 2</span><span class="frac-den">2</span></span>`, isCorrect: false },
+                    { textHTML: `<span class="frac"><span class="frac-num">x<sup>2</sup> − 2</span><span class="frac-den">x + 2</span></span>`, isCorrect: false }
+                ],
+                explanationHTML: `Numărătorul x<sup>2</sup> − 4 = (x − 2)(x + 2), iar numitorul 2x + 4 = 2(x + 2). Simplificăm factorul comun (x + 2) și rămâne <strong>(x − 2) / 2</strong>.`
+            }
+        ];
+
+        // =========================================================================
+        // 3. STAREA APLICAȚIEI & LOCALSTORAGE
+        // =========================================================================
+        const STORAGE_KEY = 'rm_math8_calcul_algebric_results_v1';
+        let solvedPracticeIds = new Set();
+        let currentQuizQuestions = [];
+        let userAnswers = {}; // { questionId: optionIndex }
+        let quizSubmitted = false;
+        let currentStudent = { name: '', className: '8-A' };
+
+        // Date demonstrative preîncărcate la prima deschidere pentru exemplificare
+        const defaultDemoResults = [
+            {
+                id: 'demo-1',
+                name: 'Ciobanu Elena (Exemplu)',
+                className: '8-A',
+                score: 10,
+                total: 10,
+                grade: 10,
+                date: '12.11.2026, 09:15',
+                isDemo: true
+            },
+            {
+                id: 'demo-2',
+                name: 'Rusu Maxim (Exemplu)',
+                className: '8-A',
+                score: 8,
+                total: 10,
+                grade: 8,
+                date: '12.11.2026, 09:22',
+                isDemo: true
+            },
+            {
+                id: 'demo-3',
+                name: 'Munteanu Sofia (Exemplu)',
+                className: '8-B',
+                score: 9,
+                total: 10,
+                grade: 9,
+                date: '12.11.2026, 10:05',
+                isDemo: true
+            }
+        ];
+
+        function loadResults() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw === null) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultDemoResults));
+                    return [...defaultDemoResults];
+                }
+                return JSON.parse(raw);
+            } catch (e) {
+                return [...defaultDemoResults];
+            }
+        }
+
+        function saveResults(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            } catch (e) {
+                console.error('Eroare salvare localStorage:', e);
+            }
+        }
+
+        // =========================================================================
+        // 4. NAVIGAREA ÎNTRE FILE (TABS)
+        // =========================================================================
+        function switchTab(tabName) {
+            const tabs = ['teorie', 'exercitii', 'test', 'rezultate'];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`panel-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    panel.classList.remove('hidden');
+                    btn.classList.add('bg-slate-50', 'text-brand-700', 'border-amber-400');
+                    btn.classList.remove('text-indigo-100', 'hover:text-white', 'hover:bg-white/10', 'border-transparent');
+                } else {
+                    panel.classList.add('hidden');
+                    btn.classList.remove('bg-slate-50', 'text-brand-700', 'border-amber-400');
+                    btn.classList.add('text-indigo-100', 'hover:text-white', 'hover:bg-white/10', 'border-transparent');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tabName === 'rezultate') {
+                renderResultsTable();
+            }
+        }
+
+        // =========================================================================
+        // 5. RANDARE ȘI VERIFICARE EXERCIȚII PRACTICE (FILA 2)
+        // =========================================================================
+        function normalizeMathInput(str) {
+            if (!str) return '';
+            return str
+                .toLowerCase()
+                .replace(/\s+/g, '')          // elimină toate spațiile
+                .replace(/−/g, '-')           // înlocuiește minusul tipografic cu minus standard
+                .replace(/²/g, '^2')          // înlocuiește superscript 2 cu ^2
+                .replace(/³/g, '^3')          // înlocuiește superscript 3 cu ^3
+                .replace(/⁴/g, '^4')
+                .replace(/\*/g, '');          // elimină semnul * opțional dintre factori
+        }
+
+        function renderPracticeExercises() {
+            const container = document.getElementById('practice-exercises-container');
+            container.innerHTML = practiceExercises.map((ex, idx) => `
+                <div id="ex-card-${ex.id}" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col justify-between transition-all">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-1 rounded-lg">
+                                Exercițiul ${idx + 1} • ${ex.category}
+                            </span>
+                            <span id="ex-status-pill-${ex.id}" class="hidden text-xs font-bold px-2.5 py-1 rounded-full"></span>
+                        </div>
+                        
+                        <div class="text-slate-800 text-sm sm:text-base leading-relaxed mb-4">
+                            ${ex.promptHTML}
+                        </div>
+
+                        <!-- Câmp introducere răspuns + buton verificare -->
+                        <div class="space-y-2.5">
+                            <label for="ex-input-${ex.id}" class="block text-xs font-semibold text-slate-500">
+                                Răspunsul tău (formă simplificată):
+                            </label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input 
+                                    type="text" 
+                                    id="ex-input-${ex.id}" 
+                                    placeholder="${ex.placeholder}"
+                                    onkeydown="if(event.key==='Enter') checkPracticeExercise(${ex.id})"
+                                    class="flex-1 font-mono text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition"
+                                >
+                                <button 
+                                    onclick="checkPracticeExercise(${ex.id})" 
+                                    class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shrink-0 shadow-xs">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                    <span>Verifică răspunsul</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Zona de feedback imediat -->
+                        <div id="ex-feedback-${ex.id}" class="hidden mt-3 p-3 rounded-xl text-xs sm:text-sm font-medium"></div>
+                    </div>
+
+                    <!-- Buton Toggle Rezolvare pas cu pas -->
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <button 
+                            onclick="togglePracticeSolution(${ex.id})" 
+                            id="ex-sol-btn-${ex.id}"
+                            class="text-xs font-semibold text-slate-600 hover:text-brand-700 flex items-center gap-1.5 py-1 transition">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                            <span>Vezi rezolvarea pas cu pas</span>
+                        </button>
+
+                        <div id="ex-solution-${ex.id}" class="hidden mt-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-2">
+                            <div class="font-bold text-slate-800 border-b border-slate-200 pb-1.5 mb-2 flex items-center justify-between">
+                                <span>Model de rezolvare detaliată:</span>
+                                <span class="text-emerald-700 font-mono">Răspuns: ${ex.displayAnswerHTML}</span>
+                            </div>
+                            ${ex.solutionStepsHTML}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function checkPracticeExercise(id) {
+            const ex = practiceExercises.find(item => item.id === id);
+            const inputEl = document.getElementById(`ex-input-${id}`);
+            const feedbackEl = document.getElementById(`ex-feedback-${id}`);
+            const pillEl = document.getElementById(`ex-status-pill-${id}`);
+            const cardEl = document.getElementById(`ex-card-${id}`);
+
+            const userVal = normalizeMathInput(inputEl.value);
+            feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200');
+
+            if (!userVal) {
+                feedbackEl.classList.add('bg-amber-50', 'text-amber-800', 'border', 'border-amber-200');
+                feedbackEl.innerHTML = `Introdu mai întâi un răspuns în casetă sau apasă pe <strong>„Vezi rezolvarea pas cu pas”</strong>.`;
+                return;
+            }
+
+            const isCorrect = ex.acceptedAnswers.some(ans => normalizeMathInput(ans) === userVal);
+
+            if (isCorrect) {
+                solvedPracticeIds.add(id);
+                updatePracticeProgress();
+
+                cardEl.classList.remove('border-slate-200', 'border-rose-300');
+                cardEl.classList.add('border-emerald-400');
+
+                pillEl.classList.remove('hidden', 'bg-rose-100', 'text-rose-700');
+                pillEl.classList.add('bg-emerald-100', 'text-emerald-700');
+                pillEl.textContent = '✓ Rezolvat';
+
+                feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                feedbackEl.innerHTML = `<strong>Excelent!</strong> Răspunsul tău este corect.`;
+            } else {
+                cardEl.classList.remove('border-slate-200', 'border-emerald-400');
+                cardEl.classList.add('border-rose-300');
+
+                pillEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700');
+                pillEl.classList.add('bg-rose-100', 'text-rose-700');
+                pillEl.textContent = 'Mai încearcă';
+
+                feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                feedbackEl.innerHTML = `<strong>Nu este chiar forma corectă.</strong> Indiciu: <em>${ex.hint}</em>`;
+            }
+        }
+
+        function togglePracticeSolution(id) {
+            const solBox = document.getElementById(`ex-solution-${id}`);
+            const btn = document.getElementById(`ex-sol-btn-${id}`);
+            const isHidden = solBox.classList.contains('hidden');
+
+            if (isHidden) {
+                solBox.classList.remove('hidden');
+                btn.innerHTML = `<i data-lucide="eye-off" class="w-4 h-4"></i><span>Ascunde rezolvarea</span>`;
+            } else {
+                solBox.classList.add('hidden');
+                btn.innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i><span>Vezi rezolvarea pas cu pas</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        function updatePracticeProgress() {
+            const count = solvedPracticeIds.size;
+            const total = practiceExercises.length;
+            document.getElementById('practice-badge').textContent = `${count}/${total}`;
+            document.getElementById('practice-progress-text').textContent = `${count} din ${total} rezolvate`;
+        }
+
+        // =========================================================================
+        // 6. TEST DE AUTOEVALUARE (FILA 3)
+        // =========================================================================
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function prepareQuizData() {
+            currentQuizQuestions = shuffleArray(quizQuestionsBank).map(q => ({
+                ...q,
+                shuffledOptions: shuffleArray(q.options)
+            }));
+            userAnswers = {};
+            quizSubmitted = false;
+        }
+
+        function startQuiz() {
+            const nameInput = document.getElementById('student-name');
+            const classSelect = document.getElementById('student-class');
+            const errorEl = document.getElementById('student-name-error');
+
+            const trimmedName = nameInput.value.trim();
+            if (trimmedName.length < 3) {
+                errorEl.classList.remove('hidden');
+                nameInput.classList.add('border-rose-500');
+                nameInput.focus();
+                return;
+            }
+
+            errorEl.classList.add('hidden');
+            nameInput.classList.remove('border-rose-500');
+
+            currentStudent = {
+                name: trimmedName,
+                className: classSelect.value
+            };
+
+            document.getElementById('active-student-display').textContent = `${currentStudent.name} (Clasa ${currentStudent.className})`;
+            document.getElementById('quiz-intro-card').classList.add('hidden');
+            document.getElementById('quiz-active-container').classList.remove('hidden');
+
+            prepareQuizData();
+            renderQuizQuestions();
+            updateQuizCounter();
+        }
+
+        function renderQuizQuestions() {
+            const container = document.getElementById('quiz-questions-list');
+            const letters = ['A', 'B', 'C', 'D'];
+
+            container.innerHTML = currentQuizQuestions.map((q, qIndex) => {
+                const selectedIdx = userAnswers[q.id];
+                const correctIdx = q.shuffledOptions.findIndex(o => o.isCorrect);
+                const isUserCorrect = quizSubmitted && selectedIdx === correctIdx;
+
+                let cardBorderClass = 'border-slate-200';
+                if (quizSubmitted) {
+                    cardBorderClass = isUserCorrect ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-rose-400 ring-1 ring-rose-200';
+                }
+
+                return `
+                    <div id="quiz-q-card-${q.id}" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border ${cardBorderClass} transition-all">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="bg-brand-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
+                                    Întrebarea ${qIndex + 1} / 10
+                                </span>
+                                <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                    ${q.topic}
+                                </span>
+                            </div>
+                            ${quizSubmitted ? (
+                                isUserCorrect 
+                                    ? `<span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Corect (+1p)</span>`
+                                    : `<span class="inline-flex items-center gap-1 text-xs font-bold bg-rose-100 text-rose-800 px-3 py-1 rounded-full shrink-0"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Greșit (0p)</span>`
+                            ) : ''}
+                        </div>
+
+                        <div class="text-slate-800 font-medium text-sm sm:text-base mb-4 leading-relaxed">
+                            ${q.questionHTML}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${q.shuffledOptions.map((opt, optIdx) => {
+                                const isSelected = selectedIdx === optIdx;
+                                let optionStyle = 'border-slate-200 hover:border-brand-300 hover:bg-slate-50 text-slate-700';
+                                let badgeStyle = 'bg-slate-100 text-slate-600';
+                                let statusIcon = '';
+
+                                if (!quizSubmitted) {
+                                    if (isSelected) {
+                                        optionStyle = 'border-brand-600 bg-brand-50/70 text-brand-900 font-semibold ring-1 ring-brand-500';
+                                        badgeStyle = 'bg-brand-600 text-white';
+                                    }
+                                } else {
+                                    if (opt.isCorrect) {
+                                        optionStyle = 'border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold';
+                                        badgeStyle = 'bg-emerald-600 text-white';
+                                        statusIcon = `<i data-lucide="check" class="w-4 h-4 text-emerald-600 ml-auto shrink-0"></i>`;
+                                    } else if (isSelected && !opt.isCorrect) {
+                                        optionStyle = 'border-rose-500 bg-rose-50 text-rose-900 font-semibold';
+                                        badgeStyle = 'bg-rose-600 text-white';
+                                        statusIcon = `<i data-lucide="x" class="w-4 h-4 text-rose-600 ml-auto shrink-0"></i>`;
+                                    } else {
+                                        optionStyle = 'border-slate-200 bg-slate-50/50 text-slate-400 opacity-75';
+                                    }
+                                }
+
+                                return `
+                                    <button 
+                                        type="button"
+                                        ${quizSubmitted ? 'disabled' : ''}
+                                        onclick="selectQuizOption(${q.id}, ${optIdx})"
+                                        class="flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${optionStyle}">
+                                        <span class="w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 ${badgeStyle}">
+                                            ${letters[optIdx]}
+                                        </span>
+                                        <span class="font-mono text-sm">${opt.textHTML}</span>
+                                        ${statusIcon}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        ${quizSubmitted ? `
+                            <div class="mt-4 p-3.5 rounded-xl text-xs sm:text-sm ${isUserCorrect ? 'bg-emerald-50/80 border border-emerald-200 text-emerald-900' : 'bg-rose-50/80 border border-rose-200 text-rose-900'}">
+                                <div class="font-bold mb-1">
+                                    ${isUserCorrect ? 'Răspuns corect!' : `Răspuns greșit. Varianta corectă era ${letters[correctIdx]}.`}
+                                </div>
+                                <div class="text-slate-700 leading-relaxed">
+                                    <strong>Explicație:</strong> ${q.explanationHTML}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function selectQuizOption(questionId, optionIndex) {
+            if (quizSubmitted) return;
+            userAnswers[questionId] = optionIndex;
+            document.getElementById('quiz-validation-alert').classList.add('hidden');
+            renderQuizQuestions();
+            updateQuizCounter();
+        }
+
+        function updateQuizCounter() {
+            const answeredCount = Object.keys(userAnswers).length;
+            document.getElementById('quiz-answered-counter').textContent = `Răspunsuri selectate: ${answeredCount} / 10`;
+        }
+
+        function calculateRMGrade(score, total) {
+            if (score <= 1) return 1;
+            return Math.round((score / total) * 10);
+        }
+
+        function submitQuiz() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const alertBox = document.getElementById('quiz-validation-alert');
+
+            if (answeredCount < currentQuizQuestions.length) {
+                const remaining = currentQuizQuestions.length - answeredCount;
+                document.getElementById('quiz-validation-text').textContent = 
+                    `Mai ai ${remaining} ${remaining === 1 ? 'întrebare fără răspuns' : 'întrebări fără răspuns'}. Selectează o variantă pentru fiecare întrebare înainte de verificare!`;
+                alertBox.classList.remove('hidden');
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            alertBox.classList.add('hidden');
+            quizSubmitted = true;
+
+            let score = 0;
+            currentQuizQuestions.forEach(q => {
+                const chosenIdx = userAnswers[q.id];
+                if (q.shuffledOptions[chosenIdx] && q.shuffledOptions[chosenIdx].isCorrect) {
+                    score++;
+                }
+            });
+
+            const grade = calculateRMGrade(score, 10);
+
+            document.getElementById('score-points').textContent = `${score}/10`;
+            document.getElementById('score-grade').textContent = `${grade}`;
+
+            let headline = '';
+            let msg = '';
+            if (grade >= 9) {
+                headline = `Excelent, ${currentStudent.name}!`;
+                msg = 'Stăpânești foarte bine regulile de calcul algebric, formulele de calcul prescurtat și rapoartele algebrice.';
+            } else if (grade >= 7) {
+                headline = `Rezultat bun, ${currentStudent.name}!`;
+                msg = 'Ai o bază solidă. Analizează explicațiile la întrebările greșite pentru a ajunge la nota 10.';
+            } else if (grade >= 5) {
+                headline = `Test promovat, ${currentStudent.name}.`;
+                msg = 'Recomandăm să revezi fila „1. Teorie și Exemple” și să reiei testul pentru a-ți consolida cunoștințele.';
+            } else {
+                headline = `Mai ai nevoie de exercițiu, ${currentStudent.name}.`;
+                msg = 'Parcurge cu atenție rezolvările pas cu pas din fila 2, apoi încearcă din nou testul!';
+            }
+
+            document.getElementById('score-headline').textContent = headline;
+            document.getElementById('score-feedback-msg').textContent = msg;
+
+            document.getElementById('quiz-score-banner').classList.remove('hidden');
+            document.getElementById('quiz-submit-wrapper').classList.add('hidden');
+
+            renderQuizQuestions();
+
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('ro-RO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) + ', ' + now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+            const newRecord = {
+                id: 'res-' + Date.now(),
+                name: currentStudent.name,
+                className: currentStudent.className,
+                score: score,
+                total: 10,
+                grade: grade,
+                date: formattedDate,
+                isDemo: false
+            };
+
+            // -----------------------------------------------------------------
+            // INTEGRERE GOOGLE SHEETS VIA APPS SCRIPT WEB APP
+            // -----------------------------------------------------------------
+            const scriptURL = "https://script.google.com/macros/s/AKfycbwwczZ1c6rkOOmG-26bcNXOhjrAoWJvZaSPJKUFogCSvUT2jGluf60g-92z3zP4oJ7m/exec";
+            
+            fetch(scriptURL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    nume: currentStudent.name,
+                    clasa: currentStudent.className,
+                    punctaj: `${score}/10 (Nota ${grade})`,
+                    data: formattedDate
+                })
+            })
+            .then(() => {
+                console.log("Rezultatul a fost trimis cu succes în Google Sheets!");
+            })
+            .catch((err) => {
+                console.error("Eroare la trimiterea în Google Sheets:", err);
+            });
+            // -----------------------------------------------------------------
+
+            const existing = loadResults();
+            existing.unshift(newRecord);
+            saveResults(existing);
+            updateResultsBadge();
+            showToast(`Rezultatul (${score}/10, Nota ${grade}) a fost salvat local și trimis profesorului!`);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function retakeQuiz(changeStudent) {
+            document.getElementById('quiz-score-banner').classList.add('hidden');
+            document.getElementById('quiz-submit-wrapper').classList.remove('hidden');
+            document.getElementById('quiz-validation-alert').classList.add('hidden');
+
+            if (changeStudent) {
+                document.getElementById('quiz-active-container').classList.add('hidden');
+                document.getElementById('quiz-intro-card').classList.remove('hidden');
+                document.getElementById('student-name').value = '';
+                document.getElementById('student-name').focus();
+            } else {
+                prepareQuizData();
+                renderQuizQuestions();
+                updateQuizCounter();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showToast('Testul a fost resetat cu întrebările amestecate!');
+            }
+        }
+
+        // =========================================================================
+        // 7. CATALOG REZULTATE ELEVI (FILA 4)
+        // =========================================================================
+        function updateResultsBadge() {
+            const list = loadResults();
+            document.getElementById('results-count-badge').textContent = list.length;
+        }
+
+        function getGradeBadgeInfo(grade) {
+            if (grade >= 9) return { label: 'Excelent', classes: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+            if (grade >= 7) return { label: 'Bine', classes: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
+            if (grade >= 5) return { label: 'Suficient', classes: 'bg-amber-100 text-amber-800 border-amber-200' };
+            return { label: 'Insuficient', classes: 'bg-rose-100 text-rose-800 border-rose-200' };
+        }
+
+        function renderResultsTable() {
+            const allResults = loadResults();
+            const filterClass = document.getElementById('filter-class').value;
+            const filtered = filterClass === 'ALL'
+                ? allResults
+                : allResults.filter(r => r.className === filterClass);
+
+            const tbody = document.getElementById('results-table-body');
+            const emptyState = document.getElementById('results-empty-state');
+
+            document.getElementById('stat-total-students').textContent = filtered.length;
+            if (filtered.length > 0) {
+                const avg = (filtered.reduce((acc, item) => acc + item.grade, 0) / filtered.length).toFixed(2);
+                const maxScore = Math.max(...filtered.map(item => item.score));
+                document.getElementById('stat-avg-grade').textContent = avg;
+                document.getElementById('stat-max-score').textContent = `${maxScore} / 10`;
+            } else {
+                document.getElementById('stat-avg-grade').textContent = '—';
+                document.getElementById('stat-max-score').textContent = '—';
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map((item, idx) => {
+                const status = getGradeBadgeInfo(item.grade);
+                return `
+                    <tr class="hover:bg-slate-50/90 transition">
+                        <td class="py-3.5 px-5 font-mono text-xs text-slate-400">${idx + 1}</td>
+                        <td class="py-3.5 px-5 font-semibold text-slate-800">
+                            ${escapeHTML(item.name)}
+                            ${item.isDemo ? '<span class="ml-1.5 text-[10px] font-medium bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">demo</span>' : ''}
+                        </td>
+                        <td class="py-3.5 px-5">
+                            <span class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">
+                                ${escapeHTML(item.className)}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-5 font-mono font-bold text-slate-700">${item.score} / ${item.total}</td>
+                        <td class="py-3.5 px-5">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl font-extrabold text-sm ${item.grade >= 5 ? 'bg-brand-50 text-brand-700' : 'bg-rose-50 text-rose-700'}">
+                                ${item.grade}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-5">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${status.classes}">
+                                ${status.label}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-5 text-xs text-slate-500 font-mono">${escapeHTML(item.date)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function exportResultsCSV() {
+            const results = loadResults();
+            if (results.length === 0) {
+                showToast('Nu există rezultate de exportat.');
+                return;
+            }
+
+            let csvContent = '\uFEFF';
+            csvContent += 'Nr;Nume si Prenume;Clasa;Punctaj;Nota (RM);Calificativ;Data si ora\n';
+
+            results.forEach((r, idx) => {
+                const status = getGradeBadgeInfo(r.grade).label;
+                const cleanName = r.name.replace(/;/g, ',');
+                csvContent += `${idx + 1};"${cleanName}";${r.className};"${r.score}/${r.total}";${r.grade};${status};"${r.date}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Rezultate_Calcul_Algebric_Clasa8_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast('Fișierul CSV a fost descărcat!');
+        }
+
+        function requestClearResults() {
+            const modal = document.getElementById('confirm-clear-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeClearModal() {
+            const modal = document.getElementById('confirm-clear-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmClearResults() {
+            saveResults([]);
+            closeClearModal();
+            updateResultsBadge();
+            renderResultsTable();
+            showToast('Istoricul rezultatelor a fost șters.');
+        }
+
+        // =========================================================================
+        // 8. UTILITARE UI (MODALE & NOTIFICĂRI)
+        // =========================================================================
+        function toggleHelpModal() {
+            const modal = document.getElementById('help-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        let toastTimeout = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('flex');
+            toast.classList.remove('hidden');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3500);
+        }
+
+        window.onload = function () {
+            renderPracticeExercises();
+            updatePracticeProgress();
+            updateResultsBadge();
+            renderResultsTable();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
